@@ -14,6 +14,9 @@ class TranscriptionAppView:
         self.create_widgets()
 
     def create_widgets(self):
+        self.text_label = tk.Label(self.root, text="Transcription:")
+        self.text_label.pack()
+
         self.text_area = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=60, height=20)
         self.text_area.pack(pady=10)
 
