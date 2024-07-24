@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, filedialog, messagebox
+from tkinter import scrolledtext, messagebox
 
 class TranscriptionAppView:
     def __init__(self, root, controller):
@@ -22,9 +22,6 @@ class TranscriptionAppView:
 
         self.save_button = tk.Button(self.root, text="Save Transcript", command=self.controller.save_transcript)
         self.save_button.pack(side=tk.LEFT, padx=10)
-
-        self.response_button = tk.Button(self.root, text="Generate Response", command=self.controller.generate_response)
-        self.response_button.pack(side=tk.LEFT, padx=10)
 
     def update_transcript(self, text):
         self.text_area.insert(tk.END, text + "\n")

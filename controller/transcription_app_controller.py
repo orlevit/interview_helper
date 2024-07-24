@@ -1,5 +1,4 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 import threading
 import speech_recognition as sr
 from model.gpt2_text_generator import TextGenerator
@@ -22,6 +21,8 @@ class TranscriptionAppController:
 
     def stop_recording(self):
         self.transcribing = False
+        # Once transcription stops, generate a response
+        self.generate_response()
 
     def save_transcript(self):
         if self.transcript:
