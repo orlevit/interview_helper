@@ -1,8 +1,9 @@
-#copilot
 import tkinter as tk
 from tkinter import scrolledtext, filedialog, messagebox
 import speech_recognition as sr
 import threading
+import torch
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 class TranscriptionApp:
     def __init__(self, root):
@@ -14,6 +15,10 @@ class TranscriptionApp:
         self.microphone = sr.Microphone()
         self.transcribing = False
         self.transcript = ""
+
+        # Load GPT-2 model and tokenizer
+        self.tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+        self.model = GPT2LMHeadModel.from_pretrained('gpt2')
 
         self.create_widgets()
 
@@ -38,6 +43,8 @@ class TranscriptionApp:
 
     def stop_recording(self):
         self.transcribing = False
+        # Once transcription stops, generate a response
+        self.generate_response()
 
     def save_transcript(self):
         if self.transcript:
@@ -55,7 +62,7 @@ class TranscriptionApp:
             while self.transcribing:
                 try:
                     audio = self.recognizer.listen(source, timeout=1, phrase_time_limit=5)
-                    text = self.recognizer.recognize_google(audio, language="he-IL")
+                    text = self.recognizer.recognize_google(audio, language="en-US")
                     self.transcript += text + "\n"
                     self.text_area.insert(tk.END, text + "\n")
                     self.text_area.see(tk.END)
@@ -65,6 +72,16 @@ class TranscriptionApp:
                     self.text_area.insert(tk.END, "[Unrecognized speech]\n")
                 except sr.RequestError as e:
                     self.text_area.insert(tk.END, f"[Error: {e}]\n")
+
+    def generate_response(self):
+        if self.transcript:
+            input_ids = self.tokenizer.encode(self.transcript, return_tensors='pt')
+            with torch.no_grad():
+                output = self.model.generate(input_ids, max_length=150, num_return_sequences=1, no_repeat_ngram_size=2)
+            response = self.tokenizer.decode(output[0], skip_special_tokens=True)
+            messagebox.showinfo("Response", f"Model response:\n{response}")
+        else:
+            messagebox.showwarning("Warning", "No transcript available!")
 
 if __name__ == "__main__":
     root = tk.Tk()
