@@ -16,7 +16,7 @@ class TranscriptionAppController:
     def start_recording(self):
         self.transcribing = True
         self.transcript = ""
-        self.view.clear_transcript()
+        # self.view.clear_transcript()
         threading.Thread(target=self.transcribe).start()
 
     def stop_recording(self):
@@ -45,7 +45,7 @@ class TranscriptionAppController:
                     audio = self.recognizer.listen(source, timeout=1, phrase_time_limit=5)
                     text = self.recognizer.recognize_google(audio, language="en-US")
                     self.transcript += text + "\n"
-                    self.view.update_transcript(text)
+                    self.view.update_transcript(f'Speaker:\n{text}')
                 except sr.WaitTimeoutError:
                     continue
                 except sr.UnknownValueError:
@@ -57,6 +57,6 @@ class TranscriptionAppController:
         if self.transcript:
             # Generate response using TextGenerator instance
             response = self.generator.generate_text(self.transcript)
-            self.view.show_message("Response", f"Model response:\n{response}")
+            self.view.update_response(f"Model response:\n{response}")
         else:
             self.view.show_warning("Warning", "No transcript available!")
